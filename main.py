@@ -154,7 +154,7 @@ def sql_delete_operation(conn, cursor, student_id):
         # ilgili id degerine sahip olani sil ve kac satir oldugunu dondur
         cursor.execute("DELETE FROM Students WHERE id = ?", (student_id,))
         
-        deleted_record = cursor.rowcount()
+        deleted_record = cursor.rowcount
         
         # islemi gerceklestir
         conn.commit()
@@ -163,11 +163,79 @@ def sql_delete_operation(conn, cursor, student_id):
     #sqlite'dan kaynakli hata var mi kontrol edelim
     except sqlite3.Error as err:
         # conn.rollback()
-        raise Exception("Ooops. We had a problem: {err}")
+        raise Exception("Ooops. We had a problem (Bir Hata ile Karsilasildi): {err}")
 
 
+#%% Update operation
+def sql_update_operation(conn, cursor, student_id: int, student_name: str = None, student_surname: str = None,student_age: int = None, student_email:str = None, student_city: str = None)-> bool:
+    try:
+        try:
+            student_id = int(student_id)
+        except (TypeError, ValueError):
+            raise ValueError("Student ID must be an integer or convertible to integer")
+            # raise ValueError("Ogrenci ID, Integer veya ona donusturulebilir veri tipinde olmali")
+        # check is age numeric?
+        if student_age is not None and not isinstance(student_age, int):
+            raise ValueError("Student Age must be an integer")
+            # raise ValueError("Ogrenci Yasi Tam Sayi Olmali")
+        # check is there a record
+        
+        
+        
+        
+        cursor.execute("SELECT * FROM Students WHERE id = ?", (student_id,))
+        record = cursor.fetchone()
+        if record is None:
+            print(f"Student with id = {student_id} not found")
+            # print(f"Ogrenci ID'si = {student_id} bulunamadi"")
+            return False #bool donduracegimiz icin False vermesi iyi olur.
+        
+        # create empty lists
+        # parametrelerimiz ve degerlerimiz icin bos liste olusturalim
+        fields = []
+        values = []
+        # check arguments 
+        if student_name is not None:
+            fields.append("name = ?")
+            values.append(student_name)
+        
+        if student_surname is not None:
+            fields.append("surname = ?")
+            values.append(student_surname) 
+        
+        if student_age is not None:
+            fields.append("age = ?")
+            values.append(student_age)
+        
+        if student_email is not None:
+            fields.append("email = ?")
+            values.append(student_email)
+            
+        if student_city is not None:
+            fields.append("city = ?")
+            values.append(student_city)
+        
+        if not fields:
+            return False # hicbir deger girilmemis demektir
+        
+        values.append(student_id)
+        
+        # sql sorgumuzu yazalim. Burada parametrelerimiz , ile birlestirilecek. name, surname vb. gibi
+        update_query = f"UPDATE Students SET {', '.join(fields)} WHERE id = ?"
+        cursor.execute(update_query, values)
+        updated = cursor.rowcount
 
-
+        
+        # islemi gerceklestir.
+        conn.commit()
+        
+        # etkilenen satir sayisini karsilastiralim
+        return updated > 0
+         
+    except sqlite3.Error as err:
+        conn.rollback() # veri tabani guvenligi icin gerekli olabilir
+        raise Exception(f"An unexpected error occurred: {err}")
+        # raise Exception(f"Beklenmedik Bir Hata Meydana Geldi: {err}"")
 
 #%% 
 def main():

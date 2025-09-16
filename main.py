@@ -45,6 +45,8 @@ def create_tables(cursor):
     )               
                    ''')
 
+
+
 #%% insert_sample_data
 def insert_sample_data(cursor):
     students = [
@@ -65,8 +67,74 @@ def insert_sample_data(cursor):
     cursor.executemany(
         "INSERT INTO Students (name, surname, age, email, city) VALUES (?, ?, ?, ?, ?)", 
         students)
-
-#%%
+    
+    courses = [
+        # id, course_name, course_detail, instructor, instructor_detail, credits
+        ("DS360","End-to-end data science project is waiting for you","Yasemin Arslan","She is a wonderful instructor",40),
+        ("Data Science and Machine Learning","We are here with 100 days of comprehensive content","Atil Samancioglu","Always at the top",65),
+        ("AI Integrated With C# .NET","Join us on this journey","Murat Yucedag","He always think of you",20),
+        ("C# Fundamentals","If you want to learn C#, you can enroll this course","Murat Yucedag","He always think of you",40),
+        ("Zero To Hero Python Course","Master Python by building 100 projects in 100 days. Learn data science, automation, build websites, games and apps!","Angela Yu","She is a developer with a passion for teaching.",100)
+    ]
+    cursor.executemany(
+        "INSERT INTO Courses (course_name, course_detail, instructor, instructor_detail, credits) VALUES (?, ?, ?, ?, ?)",
+        courses)
+    
+    print("Sample data inserted successfully")
+    
+#%% READ Operation
+def basic_sql_operations(cursor):
+    
+    # 1:) Select all records
+    print("*"*10,"SELECT ALL","*"*10)
+    cursor.execute("SELECT * FROM Students")
+    records = cursor.fetchall() # return a list
+    
+    # show each data
+    for row in records:
+        print(row) # row=> return tuple
+        # print(f"ID: row[0], Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]} )
+    
+    # 2:) Select columns
+    print("*"*10,"SELECT NAME AND SURNAME COLUMNS","*"*10)
+    cursor.execute("SELECT name, surname FROM Students")
+    name_surname_list = cursor.fetchall()
+    for row in name_surname_list:
+        print(f"Name: {row[0]} Surname: {row[1]}")
+    
+    
+    # 3:) Filtered Records
+    print("*"*10, "Age Filtered Records","*"*10)
+    cursor.execute("SELECT * FROM Students WHERE age <=30")
+    filtered_records = cursor.fetchall()
+    for row in filtered_records:
+        #print(row)
+        print(f"ID: {row[0]}, Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]}")
+    
+    
+    
+    # 4:) Filter with string
+    print("*"*10,"CITY = 'ISTANBUL'","*"*10)
+    cursor.execute("SELECT * FROM Students WHERE city = 'Istanbul'")
+    filtered_city_records = cursor.fetchall()
+    for row in filtered_city_records:
+        print(row)
+        
+        
+    # 5:) Order by
+    print("*"*10, "ORDER BY age Column","*"*10)
+    cursor.execute("SELECT * FROM Students ORDER BY age")
+    ordered_records = cursor.fetchall()
+    for row in ordered_records:
+        print(f"ID: {row[0]}, Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]}")     
+        
+    # 6:) LIMIT
+    print("*"*10, "GET FIRST ROW","*"*10)
+    cursor.execute("SELECT * FROM Students LIMIT 1")
+    record = cursor.fetchall()
+    for row in record:
+        print(f"ID: {row[0]}, Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]}") 
+#%% 
 def main():
     #print("SQL With Python Created...")
     conn, cursor = create_database()

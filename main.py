@@ -134,6 +134,41 @@ def basic_sql_operations(cursor):
     record = cursor.fetchall()
     for row in record:
         print(f"ID: {row[0]}, Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]}") 
+
+#%% CRUD Operations
+def sql_delete_operation(conn, cursor, student_id):
+    try:
+        # convert to integer => student_id
+        try:
+            student_id = int(student_id)
+        except(ValueError, TypeError):
+            raise ValueError("Student ID must be an integer or convertible to int")
+    
+        # Belirtilen sarta uygun ogrenci id var mi? (is there a )
+        cursor.execute("SELECT 1 FROM Students WHERE id = ?", (student_id,))
+        
+        # kayit None donerse, demek ki o id'ye sahip kayit yoktur
+        if cursor.fetchone() is None:
+            return False
+        
+        # ilgili id degerine sahip olani sil ve kac satir oldugunu dondur
+        cursor.execute("DELETE FROM Students WHERE id = ?", (student_id,))
+        
+        deleted_record = cursor.rowcount()
+        
+        # islemi gerceklestir
+        conn.commit()
+        
+        return deleted_record > 0
+    #sqlite'dan kaynakli hata var mi kontrol edelim
+    except sqlite3.Error as err:
+        # conn.rollback()
+        raise Exception("Ooops. We had a problem: {err}")
+
+
+
+
+
 #%% 
 def main():
     #print("SQL With Python Created...")
@@ -144,6 +179,7 @@ def main():
         # ilgili fonksiyonlari cagir (call the functions)        
         create_tables(cursor)
         insert_sample_data(cursor)
+        basic_sql_operations(cursor=cursor)
         conn.commit() # imlecin gerceklesitirdigi isleri uygula 
         
     except sqlite3.Error as err:
@@ -151,6 +187,10 @@ def main():
     
     finally:
         conn.close() # baglanti mutlaka kapatilmalidir
-    
+
+
+
+
 if __name__ == "__main__":
     main()
+# %%

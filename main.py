@@ -131,9 +131,9 @@ def basic_sql_operations(cursor):
     # 6:) LIMIT
     print("*"*10, "GET FIRST ROW","*"*10)
     cursor.execute("SELECT * FROM Students LIMIT 1")
-    record = cursor.fetchall()
-    for row in record:
-        print(f"ID: {row[0]}, Name: {row[1]}, Surname: {row[2]}, Age: {row[3]}, Email:{row[4]}, City: {row[5]}") 
+    record = cursor.fetchone()
+    if record:
+        print(f"ID: {record[0]}, Name: {record[1]}, Surname: {record[2]}, Age: {record[3]}, Email:{record[4]}, City: {record[5]}") 
 
 #%% CRUD Operations
 def sql_delete_operation(conn, cursor, student_id):
@@ -162,8 +162,10 @@ def sql_delete_operation(conn, cursor, student_id):
         return deleted_record > 0
     #sqlite'dan kaynakli hata var mi kontrol edelim
     except sqlite3.Error as err:
-        # conn.rollback()
-        raise Exception("Ooops. We had a problem (Bir Hata ile Karsilasildi): {err}")
+        conn.rollback() # veri tabani guvenligi icin gerekli
+        raise Exception(f"Ooops. We had a problem : {err}")
+        #raise Exception(f"Ooops. Bir Hata ile Karsilasildi: {err}")
+    
 
 
 #%% Update operation
@@ -256,8 +258,47 @@ def main():
     finally:
         conn.close() # baglanti mutlaka kapatilmalidir
 
-
-
+#%% Aggregate Function
+def basic_agg_functions(cursor):
+    #1 :) Count=> Kayit sayisini getirir
+    print("*"*10, "AGGREGATE FUNCTION COUNT","*"*10)
+    cursor.execute("SELECT COUNT(*) FROM Students")
+    
+    result = cursor.fetchone() # return tuple :sadece bir yanit donecekse
+    print(result[0])
+    print()
+    
+    
+    
+    # 2:) AVG (Average) => Ortalamasini getirir
+    print("*"*10, "AGGREGATE FUNCTON AVG","*"*10)
+    cursor.execute("SELECT AVG(age) FROM Students")
+    result = cursor.fetchone()
+    print(result[0],"\n")
+    
+    
+    # 3:) Max (Maximum) & Min (Minimum): En yuksek ve en dusuk degerleri getirir
+    print("*"*10, "AGGREGATE FUNCTION MIN AND MAX","*"*10)
+    cursor.execute("SELECT MIN(age), MAX(age) FROM Students")
+    result = cursor.fetchall() # return list
+    """
+    Other way
+    result = cursor.fetchone()
+    min_age, max_age = result
+    print("Minimum Age: ",min_age)
+    print("Maximum Age: ",max_age)
+    """
+    min_age, max_age = result[0]
+    print(f"Minimum Age: {min_age}, Maximum Age: {max_age}","\n")
+    # print(f"Minimum Age: {result[0][0]}, Maximum Age {result[0][1]}"")
+    
+    # 4:) Group By
+    print("*"*10, "GROUP BY EXAMPLE","*"*10)
+    cursor.execute("SELECT city, COUNT(*) FROM Students GROUP BY city")
+    records = cursor.fetchall()
+    for row in records:
+        print(f"City: {row[0]: <10}, Count: {row[1]}") # sola 10 karakter hizalayalim
+#%% call the main.py
 
 if __name__ == "__main__":
     main()

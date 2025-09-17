@@ -125,6 +125,49 @@ def create_tables(cursor):
         create_table_country(cursor=cursor)
         create_table_company(cursor)
         create_table_employee(cursor)
+
+
+#%% ınsert some samples
+def insert_samples_to_country(cursor):
+    countries = [
+        ('Turkey',),
+        ('Azerbaijan',),
+        ('Uzbekistan',),
+        ('Kyrgyzstran',),
+        ('Hungary',),
+        ('USA',),
+        ('Germany',),
+        ('France',),
+        ('Italy',),
+        ('Spain',),
+        ('Portugal',),
+        ('Poland',),
+        ('Greek',),
+        ('England',),
+        ('Russia',),
+        ('China',),
+        ('South Korea',),
+        ('North Korea',),
+        ('Japanese',),
+        ('Singapore',),
+        ('Qatar',),
+        ('Saudi Arabia',),
+        ('Egypt',),
+        ('Norway',),
+        ('Sweden',),
+        ('Switzerland',),
+        ('Argentina',),
+        ('Brazil',),
+        ('Uruguay',),
+        ('Chile',),
+        ('Mexico',)
+    ]
+    cursor.executemany(
+        'INSERT INTO COUNTRY(Country) VALUES (?)',countries,
+    )
+    
+    
+
         
 #%% 
 def main():

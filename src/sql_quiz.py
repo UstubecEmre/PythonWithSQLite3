@@ -20,6 +20,22 @@ def create_database():
         
 
 
+def create_table_employee(cursor):
+    cursor.execute('''
+                   CREATE TABLE EMPLOYEE(
+                       ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                       Name VARCHAR(50) NOT NULL,
+                       Surname VARCHAR(50) NOT NULL,
+                       Email VARCHAR(100) UNIQUE,
+                       CompanyID INTEGER,
+                       Salary INT CHECK(Salary >= 0),
+                       Experience INT CHECK(Experience >= 0),
+                       StartDate TEXT CHECK('1950-01-01'<= StartDate AND StartDate < DATE('now','+1 day'))
+                       
+                   )
+                   
+                   
+                   ''')
 #%% 
 if __name__ == "__main__":
     """conn, cursor = create_database()

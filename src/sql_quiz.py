@@ -45,8 +45,17 @@ def create_table_company(cursor):
                         CompanyMission TEXT NOT NULL,
                         CountryID INTEGER,
                         EstablishedDate TEXT CHECK('1850-01-01'<= EstablishedDate AND EstablishedDate < DATE('now','+1 day'))
+                        FOREIGN KEY (CountryID) REFERENCES COUNTRY(ID)
                     )
                    
+                   ''')
+
+def create_table_country(cursor):
+    cursor.execute('''
+                   CREATE TABLE IF NOT EXISTS COUNTRY(
+                       ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                       Country VARCHAR(100)
+                   )
                    ''')
 
 #%% 
@@ -55,6 +64,8 @@ if __name__ == "__main__":
     conn.commit()
     conn.close()"""
     with sqlite3.connect(db_path) as conn:
+        
+        conn.execute("PRAGMA foreign_keys = ON;")
         cursor = conn.cursor()
         print("Connection successful.") 
 

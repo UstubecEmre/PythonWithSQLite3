@@ -254,6 +254,8 @@ def get_country(cursor, country_id: int):
             return False
         print(f"Country ID: {record[0]}, Country Name: {record[1]}")
         return True
+    except sqlite3.Error as err:
+        return Exception(f"An unexpected error occured: {err}")
 
     
 def get_employee(cursor, employee_id):
@@ -290,6 +292,37 @@ def get_employee(cursor, employee_id):
     except sqlite3.Error as err:
         # conn.rollback() # veri tabani guvenligi icin gerekli olabilir
         raise Exception(f"An unexpected error occurred: {err}")
+    
+
+# insert into
+
+def insert_sample_to_country(conn,cursor, country_name: str = None):
+    try:
+        # is there any record (daha onceden o isimde var mi)
+        cursor.execute('SELECT * FROM COUNTRY WHERE Country = ?',(country_name,))
+        record = cursor.fetchone()
+        if record is not None:
+            print(f"This Country {record[1]} Already exists")
+            return False
+        
+        
+        cursor.execute('INSERT INTO COUNTRY(Country) VALUES (?)', (country_name,))
+        # save and apply
+        conn.commit()
+        
+        
+        inserted_id = cursor.lastrowid
+        print(f"Country Inserted... CountryID: {inserted_id} - Country Name: {country_name}")
+        
+        #effected_row = cursor.rowcount
+        
+        return cursor.rowcount > 0
+                    
+    except sqlite3.Error as err:
+        print(f"An unexpected Error Occured: {err}")        
+  
+  
+
 
 #%% create main function
 def main():

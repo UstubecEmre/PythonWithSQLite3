@@ -6,13 +6,19 @@ import os
 # if you want to view students.db, you can install DBeaver
 
 #%% create_database function
+
+# create a new db folder
+db_folder = "db"
+os.makedirs(db_folder, exist_ok= True)
+db_path = os.path.join(db_folder, "students.db")
+
+
 def create_database():
     # check database path (yolunu kontrol edelim)
-    if os.path.exists("students.db"):
-        os.remove("students.db")
-
+    #if os.path.exists(db_path):
+        # os.remove(db_path)
     # use connect and create connection 
-    conn = sqlite3.connect("students.db") 
+    conn = sqlite3.connect(db_path) 
 
     # create cursor
     cursor = conn.cursor() # imlec, baglantiyi kullanarak islemleri gerceklestirir
@@ -23,7 +29,7 @@ def create_database():
 #%% implement create_tables()
 def create_tables(cursor):
     cursor.execute('''
-    CREATE TABLE Students(
+    CREATE TABLE IF NOT EXISTS Students(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name VARCHAR(45) NOT NULL,
         surname VARCHAR(45),
@@ -35,7 +41,7 @@ def create_tables(cursor):
                    ''')
     
     cursor.execute('''
-    CREATE TABLE Courses(
+    CREATE TABLE IF NOT EXISTS Courses(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         course_name VARCHAR(50) NOT NULL,
         course_detail TEXT,
@@ -65,7 +71,7 @@ def insert_sample_data(cursor):
 
     #Birden fazla kayit eklemek icin cursor.executemany() 
     cursor.executemany(
-        "INSERT INTO Students (name, surname, age, email, city) VALUES (?, ?, ?, ?, ?)", 
+        "INSERT OR IGNORE INTO Students (name, surname, age, email, city) VALUES (?, ?, ?, ?, ?)", 
         students)
     
     courses = [
@@ -77,7 +83,7 @@ def insert_sample_data(cursor):
         ("Zero To Hero Python Course","Master Python by building 100 projects in 100 days. Learn data science, automation, build websites, games and apps!","Angela Yu","She is a developer with a passion for teaching.",100)
     ]
     cursor.executemany(
-        "INSERT INTO Courses (course_name, course_detail, instructor, instructor_detail, credits) VALUES (?, ?, ?, ?, ?)",
+        "INSERT  OR IGNORE INTO Courses (course_name, course_detail, instructor, instructor_detail, credits) VALUES (?, ?, ?, ?, ?)",
         courses)
     
     print("Sample data inserted successfully")
@@ -302,4 +308,4 @@ def basic_agg_functions(cursor):
 
 if __name__ == "__main__":
     main()
-# %%
+

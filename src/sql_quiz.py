@@ -217,7 +217,80 @@ def insert_samples_to_employee(conn, cursor,company_ids):
                    ''',employees)
     conn.commit()
     
+
+
+
+# Question 1: Şirketi Microsoft olan kayitlari getiren sorguyu yaziniz.
+def get_company(cursor, company_name: str):
+    try:
+        cursor.execute('''
+                    SELECT * FROM COMPANY WHERE CompanyName = '?' 
+                    ''',(company_name,))
+        records = cursor.fetchall()
+        #ID, CompanyName, CompanyVision, CountryID, EstablishedDate, 
+        if not records:
+            return False
+        
+        for record in records:
+            print(f"Emplyee's ID: {record[0]}, Company's Name: {record[1]},Company's Vision: {record[2]}, Country ID: {record[3]}, Established Date: {record[4]}")
+        return True
+    except sqlite3.Error as err:
+        print(f"Database Error Occured: {err}")
+        return False
+
+def get_country(cursor, country_id: int):
+    try:
+        try:
+             country_id = int(country_id)
+        except (TypeError, ValueError):
+                raise ValueError('Country ID must be an integer or convertible to integer')
+        
+        cursor.execute('SELECT * FROM COUNTRY WHERE ID = ?',(country_id,))
+        
+        record = cursor.fetchone() # return a tuple
+        
+        if not record:
+            print("Not Found")
+            return False
+        print(f"Country ID: {record[0]}, Country Name: {record[1]}")
+        return True
+
     
+def get_employee(cursor, employee_id):
+    try:
+        try:
+            employee_id = int(employee_id)
+        except(TypeError, ValueError):
+            raise ValueError('Employee ID must be an integer or conversible to integer')
+            #if employee_id is None or isinstance(employee_id, int):
+                #return False   
+        cursor.execute('SELECT * FROM EMPLOYEE WHERE ID = ?', (employee_id,))
+        record = cursor.fetchone() # return a tuple
+        if record is None:
+            print("Record Not Found")
+            return False 
+        '''
+        Employee Data: if you want to define a dict, you can do it 
+          employee_data = {
+            "ID": record[0],
+            "Name": record[1],
+            "Surname": record[2],
+            "Email": record[3],
+            "CompanyID": record[4],
+            "Salary": record[5],
+            "Experience": record[6],
+            "StartDate": record[7],
+        }
+        '''
+        
+        # Name, Surname, Email, CompanyID, Salary, Experience, StartDate
+        print(f"Employee ID: {record[0]}, Employee's Name: {record[1]}, Employee's Surname: {record[2]},Employee's Email: {record[3]}, Company ID: {record[4]}, Salary: {record[5]}, Experience{record[6]}, Start Date: {record[7]} ")
+            
+    
+    except sqlite3.Error as err:
+        # conn.rollback() # veri tabani guvenligi icin gerekli olabilir
+        raise Exception(f"An unexpected error occurred: {err}")
+
 #%% create main function
 def main():
     """conn, cursor = create_database()

@@ -41,7 +41,7 @@ def create_table_company(cursor):
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS COMPANY(
                         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                        CompanyName VARCHAR(50) NOT NULL,
+                        CompanyName VARCHAR(50) NOT NULL UNIQUE,
                         CompanyVision TEXT NOT NULL,
                         CountryID INTEGER,
                         EstablishedDate TEXT CHECK('1850-01-01'<= EstablishedDate AND EstablishedDate < DATE('now','+1 day')),
@@ -54,16 +54,9 @@ def create_table_country(cursor):
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS COUNTRY(
                        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                       Country VARCHAR(100)
+                       Country VARCHAR(100) NOT NULL UNIQUE
                    )
                    ''')
-
-
-import sqlite3
-import os 
-# from main import create_database, create_tables, insert_sample_data
-
-#%% create a new database
 
 
 
@@ -80,7 +73,7 @@ def insert_samples_to_country(cursor):
         ('Turkey',),
         ('Azerbaijan',),
         ('Uzbekistan',),
-        ('Kyrgyzstran',),
+        ('Kyrgyzstan',),
         ('Hungary',),
         ('USA',),
         ('Germany',),
@@ -89,13 +82,13 @@ def insert_samples_to_country(cursor):
         ('Spain',),
         ('Portugal',),
         ('Poland',),
-        ('Greek',),
+        ('Greece',),
         ('England',),
         ('Russia',),
         ('China',),
         ('South Korea',),
         ('North Korea',),
-        ('Japanese',),
+        ('Japan',),
         ('Singapore',),
         ('Qatar',),
         ('Saudi Arabia',),
@@ -110,7 +103,7 @@ def insert_samples_to_country(cursor):
         ('Mexico',)
     ]
     cursor.executemany(
-        'INSERT INTO COUNTRY(Country) VALUES (?)',countries,
+        'INSERT OR IGNORE INTO COUNTRY(Country) VALUES (?)',countries,
     )
     
     
@@ -141,7 +134,7 @@ def insert_samples_to_company(cursor):
         
     ]
     cursor.executemany(
-        'INSERT INTO COMPANY(CompanyName, CompanyVision, CountryID, EstablishedDate) VALUES (?, ?, ?, ?)',companies
+        'INSERT OR IGNORE INTO COMPANY(CompanyName, CompanyVision, CountryID, EstablishedDate) VALUES (?, ?, ?, ?)',companies
     )
 
 '''
@@ -198,7 +191,7 @@ def insert_samples_to_employee(cursor):
         
     ]
     cursor.executemany('''
-                   INSERT INTO EMPLOYEE(Name, Surname, Email, CompanyID, Salary, Experience, StartDate) VALUES(?, ?, ?, ?, ?, ?, ?)
+                   INSERT OR IGNORE INTO EMPLOYEE(Name, Surname, Email, CompanyID, Salary, Experience, StartDate) VALUES(?, ?, ?, ?, ?, ?, ?)
                    
                    ''',employees)
     
@@ -214,7 +207,13 @@ def main():
         print("Connection successful.") 
         # call the function
         create_tables(cursor)
-        # islemleri kaydet
+        
+        # insert some samples
+        insert_samples_to_country(cursor=cursor)
+        insert_samples_to_company(cursor)
+        insert_samples_to_employee(cursor)
+        
+        # save required operations (islemleri kaydet)
         conn.commit()
         print("Tables created successfully:)")     
 #%% call the main() func

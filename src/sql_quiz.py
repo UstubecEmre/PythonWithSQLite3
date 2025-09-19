@@ -295,7 +295,7 @@ def get_employee(cursor, employee_id):
     
 
 # insert into
-
+#%% insert some records to country
 def insert_sample_to_country(conn,cursor, country_name: str = None):
     try:
         # is there any record (daha onceden o isimde var mi)
@@ -320,9 +320,155 @@ def insert_sample_to_country(conn,cursor, country_name: str = None):
                     
     except sqlite3.Error as err:
         print(f"An unexpected Error Occured: {err}")        
-  
-  
 
+#%% insert some records to company 
+#ID, CompanyName, CompanyVision, CountryID, EstablishedDate, 
+def insert_sample_to_company(conn, cursor, company_name: str = None, company_vision:str = None, country_id: int = None, established_date: str = None) ->bool:
+    try:
+        try:
+            country_id = int(country_id)
+        except (ValueError, TypeError):
+            raise ValueError("country_id must be an integer or conversible to integer")
+            
+        if company_name is None  or not isinstance(company_name, str) or len(company_name) <0:
+            print("company_name column must be a non-empty string")
+            return False
+        
+        if company_vision is None or not isinstance(company_vision,str) or len(company_vision) < 3 :
+            print("company_vision column must be a string format with length at least 3 characters")
+            return False
+        
+        if established_date is None or not isinstance(established_date, str) or len(established_date) < 8: 
+            print("established_date must be a valid string (e.g., '2020-01-01')")
+            return False
+        
+        
+        # check duplicates
+        cursor.execute('SELECT ID FROM COMPANY WHERE CompanyName = ?', (company_name,))
+        if cursor.fetchone(): #return a tuple
+            print(f"{company_name} Company Already Exists")
+            return False
+        
+        cursor.execute('SELECT ID FROM COUNTRY WHERE ID = ?', (country_id,))
+        if cursor.fetchone():
+            print(f"CountryID: {country_id} already exists")
+            return False
+        
+        cursor.execute('''
+                       INSERT INTO COMPANY(CompanyName, CompanyVision, CountryID, EstablishedDate)
+                       VALUES (?, ?, ?, ?)
+                       
+                       ''', (company_name.strip(), company_vision.strip(), country_id, established_date.strip()))
+        # save changes and apply 
+        conn.commit()   
+        print(f"Company inserted successfully: {company_name}")
+        return True
+        
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+
+
+#%% insert records to employee
+# Name, Surname, Email, CompanyID, Salary, Experience, StartDate
+import re 
+def insert_sample_to_employee(conn,cursor, employee_id:int =None,employee_name: str = None, employee_surname : str = None, employee_email: str = None, company_id:int = None, salary:int = None, experience: int = None, start_date:str = None):
+    try:
+        
+        try:
+            employee_id = int(employee_id)
+        except (TypeError, ValueError):
+            raise ValueError('Employee ID must be an integer or convertible to integer')
+        
+        try:
+            company_id = int(company_id)
+        except (TypeError, ValueError):
+            raise ValueError("Company ID must be an integer or convertible to integer")
+        
+        try:
+            salary = int(salary)
+            if salary < 0:
+                print("Salary must be greater than zero")
+        except (TypeError, ValueError):
+            raise ValueError("Salary must be an integer or convertible to integer")
+        
+        
+        if experience is None or not isinstance(experience, int) or experience <0:
+            print("Experience must be a non-negative integer")
+        
+    
+        if employee_name is None or not isinstance(employee_name, str) or len(employee_name) < 3:
+            print(f"Employee name must be string format with length at least 3 characters")
+            return False
+            
+        
+        if employee_surname is None or not isinstance(employee_surname, str) or len(employee_surname) < 3:
+            print(f"Employee surname must be string format with length at least 3 characters")
+            return False
+        
+        
+        email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        if employee_email is None  or not email_regex.match(employee_email.strip()):
+            print("Invalid email format")
+            return False
+        # return bool(email_regex.match(employee_email))
+        
+        
+        # check already exists => Employee zaten var mi?
+        cursor.execute('SELECT ID FROM EMPLOYEE WHERE ID= ?', (employee_id,))
+        if cursor.fetchone():
+            print(f"{employee_id} already exists. Please, use update function")
+            return False
+
+
+        # check company id
+        cursor.execute('SELECT ID FROM COMPANY WHERE ID = ?', (company_id,))
+        if cursor.fetchone() is None:
+            print(f"Company with ID {company_id} does not exist")
+            return False
+
+        cursor.execute(
+            ''' INSERT INTO EMPLOYEE(Name, Surname, Email, CompanyID, Salary, Experience, StartDate)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+            ''',(employee_name.strip(), employee_surname.strip(), employee_email.strip(), company_id, salary, experience, start_date.strip())
+        )
+        
+        # save changes and apply 
+        conn.commit()   
+        print(f"Employee inserted successfully: {employee_id} {employee_name} {employee_surname}")
+        return True
+    
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
+
+
+
+#%% update records
+
+
+
+
+
+
+
+#%% delete records
+
+
+
+
+
+#%% select_five_rows
+
+
+
+
+#%% order by 
+
+
+
+
+
+#&& Group by and having => AGG Functions
 
 #%% create main function
 def main():
@@ -347,6 +493,8 @@ def main():
         print("All Data Inserted Successfully:)")
         # save required operations (islemleri kaydet)
         conn.commit()
+        
+
           
 
 #%% call the main() func

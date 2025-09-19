@@ -804,10 +804,35 @@ def del_employee(conn, cursor, employee_id:int = None):
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
     
-#%% select_five_rows
+#%% select_five_rows from employee
 
-
-
+def get_employee_with_id(cursor, employee_id: int = None):
+    try:
+        if employee_id is None:
+            print("employee_id is required")
+        try:
+            employee_id = int(employee_id)
+            if employee_id <= 0:
+                print("employee_id must be greater than zero")
+        except (TypeError, ValueError):
+            raise ValueError("employee_id must be an integer or convertible integer")
+        
+        cursor.execute("SELECT ID FROM EMPLOYEE WHERE ID = ?", (employee_id,))
+        if cursor.fetchone() is None:
+            print(f"{employee_id} does not exists")
+            return False
+        
+        cursor.execute("SELECT * FROM EMPLOYEE WHERE ID = ?", (employee_id,))
+        record = cursor.fetchone() # returns a tuple
+        
+        if record:
+            print("Employee information has been retrieved")
+            return record
+        print("Employee information could not be retrieved")
+        return False
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
 
 #%% order by 
 

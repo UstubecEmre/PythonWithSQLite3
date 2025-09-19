@@ -444,7 +444,37 @@ def insert_sample_to_employee(conn,cursor, employee_id:int =None,employee_name: 
 
 
 #%% update records
-
+def update_country(conn, cursor, country_id: int = None, new_country_name : str = None):
+    try:
+        try:
+            country_id = int(country_id)
+        except (ValueError, TypeError) as err:
+            raise ValueError("Country ID must be an integer or convertible to integer")
+    
+        if new_country_name is None or not isinstance(new_country_name, str) or len(new_country_name.strip()) < 3:
+            print("New country_name must be string with at least 3 characters")
+            return False
+            
+        cursor.execute('SELECT ID FROM COUNTRY WHERE ID = ?', (country_id,))
+        if cursor.fetchone() is None:
+            print(f"{country_id} with ID {country_id} does not exist")
+            return False 
+        
+        cursor.execute('''
+                       UPDATE COUNTRY SET Name = ? WHERE ID = ?
+                       ''', (new_country_name.strip(), country_id))
+        conn.commit()   
+        
+        # control effected row
+        if cursor.rowcount > 0:
+            print(f"Country updated successfully: {country_id} - {new_country_name}")
+            return True
+        else:
+            print(f"No update performed for ID {country_id}")
+            return False
+           
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 
 
 

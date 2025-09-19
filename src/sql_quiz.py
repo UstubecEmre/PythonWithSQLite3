@@ -684,10 +684,93 @@ def update_employee(conn,
 
 #%% delete records
 
+def del_country(conn, cursor, country_id:int = None):
+    try:
+        if country_id is not None:
+            print("country_id is required")
+            return False
+        
+        try:
+            country_id = int(country_id)
+        
+        except (TypeError, ValueError):
+            raise ValueError("country_id must be an integer or convertible to integer")
+
+        cursor.execute('SELECT ID FROM COUNTRY WHERE ID = ?', (country_id,))
+        
+        if cursor.fetchone() is None:
+            print(f"ID {country_id} does not exists")
+            return False
+        
+        cursor.execute('DELETE FROM COUNTRY WHERE ID = ?', (country_id,))
+        conn.commit()
+        
+        # delete primary key-foreign key constraint => Employee => Company => Country
+        cursor.execute('''DELETE FROM EMPLOYEE 
+                       WHERE CompanyID IN (
+                           SELECT ID FROM COMPANY WHERE CountryID = ? )''', (country_id,))
+        
+        cursor.execute('DELETE FROM COMPANY WHERE CountryID = ?', (country_id,))
+        
+        
+        if cursor.rowcount > 0:
+            print(f"ID with {country_id} country deleted successfully")
+            return True
+        
+        print(f"Delete operation unsuccessfull")
+        return False
+        
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
+def del_company(conn, cursor, company_id:int = None):
+    try:
+        if company_id is None:
+            print("company_id is required")
+            return False
+        try:
+            company_id = int(company_id)
+            
+        except (TypeError, ValueError):
+            raise ValueError("company_id must be an integer or convertible to integer")
+        
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 
 
-
-
+# del company
+def del_company(conn, cursor, company_id:int = None):
+    try:
+        if company_id is None:
+            print("company_id is required")
+            return False
+        try:
+            company_id = int(company_id)
+            if company_id <= 0:
+                print("company_id must be greater than zero")
+                return False
+            
+        except (TypeError, ValueError) as err:
+            raise ValueError("company_id must be an integer or convertible to integer")
+            
+        cursor.execute("SELECT ID FROM COMPANY WHERE ID = ?", (company_id,))
+        if cursor.fetchone() is None:
+            print(f"ID: {company_id} does not exists")
+            return False 
+        
+            # del foreign key - primary key constraint
+        cursor.execute("DELETE FROM COMPANY WHERE ID = ?)", (company_id,))
+        
+        conn.commit()
+        
+        if cursor.rowcount > 0:
+            print(f"CompanyID: {company_id} deleted successfully")
+            return True
+        print("Delete operation unsuccessfully.")
+        return False
+            
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 #%% select_five_rows
 
 

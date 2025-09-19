@@ -477,6 +477,81 @@ def update_country(conn, cursor, country_id: int = None, new_country_name : str 
         raise Exception(f"An unexpected error occured: {err}")
 
 
+# ID, CompanyName, CompanyVision, CountryID, EstablishedDate, 
+def update_company(conn, cursor, company_id:int = None, company_name : str = None, company_vision: str = None, country_id : int = None, established_date : str = None):
+    try:
+        try:
+            company_id = int(company_id)
+        except (ValueError, TypeError):
+            raise ValueError("company_id must be an integer or convertible to integer")
+        
+        try:
+            country_id = int(country_id)
+        
+        except (ValueError, TypeError):
+            raise ValueError("country_id must be an integer or convertible to integer")
+
+        if company_name is None or not isinstance(company_name, str) or len(company_name.strip()) < 1:
+            print("company_name must be string with at least one character")
+            return False
+        
+        if company_vision is None or not isinstance(company_vision, str) or len(company_vision.strip()) < 3:
+            print("company_vision must be string with at least three characters")
+            return False
+        
+        if established_date is None or not isinstance(established_date, str) or not 8 < len(established_date.strip()) < 11:
+            print("established_date must be a valid string (e.g., '2020-01-01')")
+            return False
+        
+        cursor.execute('SELECT ID FROM COMPANY WHERE ID = ?',(company_id,)) 
+        if cursor.fetchone() is None:
+            print(f"ID with {company_id} does not exists")
+            return False   
+        
+        cursor.execute('SELECT ID FROM COUNTRY WHERE ID = ?',(country_id,))
+        if cursor.fetchone() is None:
+            print(f"ID with {country_id} does not exists")
+            return False
+        
+        fields = []
+        values = []
+        
+        if company_name:
+            fields.append('Name = ?')
+            values.append(company_name.strip())
+        
+        if company_vision:
+            fields.append('CompanyVision = ?')
+            values.append(company_vision.strip())
+        
+        if country_id is not None:
+            fields.append('CountryID = ?')
+            values.append(country_id)
+        
+        if established_date:
+            fields.append('EstablishedDate = ?')
+            values.append(established_date.strip())
+        
+        values.append(company_id)
+        
+        sql_query = f"UPDATE COMPANY SET {', '.join(fields)} WHERE ID = ?"
+        cursor.execute(sql_query, tuple(values))
+        
+        #save changes and apply
+        conn.commit()
+        
+        # check count of effected_rows
+        
+        if cursor.rowcount > 0:
+            print(f"Company updated successfully: {company_id}")
+            return True
+        
+        print(f"No update performed for ID {company_id}")
+        return False 
+            
+        
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 
 
 

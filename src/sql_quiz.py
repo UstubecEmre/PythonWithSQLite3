@@ -804,7 +804,7 @@ def del_employee(conn, cursor, employee_id:int = None):
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
     
-#%% select_five_rows from employee
+#%% get_employee
 
 def get_employee_with_id(cursor, employee_id: int = None):
     try:
@@ -833,14 +833,101 @@ def get_employee_with_id(cursor, employee_id: int = None):
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
     
-
 #%% order by 
 
+def get_name_ordered_employee(cursor):
+    try:
+        cursor.execute("SELECT * FROM EMPLOYEE ORDER BY Name ASC")
+        records = cursor.fetchall()
+        if not records:
+            print("No Employees Found!!!")
+            return []
+        
+        for record in records:
+             print(f"ID: {record[0]}, Name: {record[1]}, Surname: {record[2]}, Email: {record[3]}, "
+                  f"CompanyID: {record[4]}, Salary: {record[5]}, Experience: {record[6]}, StartDate: {record[7]}")
+             
+            """
+            More readable option
+            print(f"Employee ID: {record[0]}")
+            print(f"Employee Name: {record[1]}")
+            print(f"Employee Surname: {record[2]}")
+            print(f"Employee Email: {record[3]}")
+            print(f"Employee CompanyID: {record[4]}")
+            print(f"Employee Salary: {record[5]}")
+            print(f"Employee Experience: {record[6]}")
+            print(f"Employee StartDate: {record[7]}")
+            """
+        return records
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
+        
+    
+
+#%% Group by and having => AGG Functions
+def find_max_and_min_salary(cursor):
+    try:
+        cursor.execute("SELECT MIN(SALARY) AS MinSalary, MAX(SALARY) AS MaxSalary FROM EMPLOYEE")
+        record = cursor.fetchone()
+        
+        if not record or record[0] is None or record[1] is None:
+            print("No record found")
+            return False
+        
+        min_salary, max_salary = record 
+        print(f"Min Salary: {min_salary}, Max Salary: {max_salary}")
+        
+        return min_salary, max_salary
+    
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 
 
+def join__example(cursor, employee_id):
+    try:
+        if employee_id is None:
+            print("employee_id is required")
+        try:
+            employee_id = int(employee_id)
+            if employee_id <= 0:
+                print("employee_id must be greater than zero")
+        except (ValueError, TypeError):
+            raise ValueError("employee_id must be an integer or convertible to integer")
+        
+        cursor.execute("SELECT ID FROM EMPLOYEE WHERE ID = ?", (employee_id,))
+        if cursor.fetchone() is None:
+            print(f"EmployeeId: {employee_id} does not exists")
+            return False
+        
+        cursor.execute("""
+                       SELECT 
+                          E.ID AS ID, 
+                          E.Name AS ISIM, 
+                          E.Surname AS SOYISIM , 
+                          E.Salary AS MAAS, 
+                          C.Company AS SIRKET, 
+                          CT.Country AS ULKE
+                       FROM EMPLOYEE E 
+                       JOIN COMPANY C ON E.CompanyID = C.ID
+                       JOIN COUNTRY CT ON C.CountryID = CT.ID
+                       WHERE E.ID = ?
+                       """,(employee_id,))
+        
+        record = cursor.fetchone()
+        if record is None:
+            print("Information not found")
+            return False
+        
+        print(f"""Employee ID: {record[0]}, Employee Name Surname: {record[1]}  {record[2]}, Employee Salary: {record[3]},
+              Company Name: {record[4]}, Company Country: {record[5]}""")
+        
+        return record
+        
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
 
 
-#&& Group by and having => AGG Functions
 
 #%% create main function
 def main():

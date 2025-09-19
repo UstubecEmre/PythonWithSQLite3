@@ -462,7 +462,7 @@ def update_country(conn, cursor, country_id: int = None, new_country_name : str 
         
         cursor.execute('''
                        UPDATE COUNTRY SET Name = ? WHERE ID = ?
-                       ''', (new_country_name.strip(), country_id))
+                       ''', (new_country_name.strip(), country_id,))
         conn.commit()   
         
         # control effected row
@@ -553,6 +553,132 @@ def update_company(conn, cursor, company_id:int = None, company_name : str = Non
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
 
+
+# Name, Surname, Email, CompanyID, Salary, Experience, StartDate
+
+def update_employee(conn, 
+                    cursor, 
+                    employee_id: int = None,
+                    employee_name:str = None,
+                    employee_surname: str = None,
+                    employee_email:str = None,
+                    company_id:int = None,
+                    salary:int = None,
+                    experience:int = None,
+                    start_date: str = None
+                    ):
+    try:
+        try:
+            employee_id = int(employee_id)
+        except (TypeError, ValueError):
+            raise ValueError("employee_id must be an integer or convertible to integer")
+        
+        if company_id is not None:
+            try:
+                company_id = int(company_id)
+                if company_id < 1:
+                    print("Company ID must be greater than 1")
+                    return False
+            except (TypeError, ValueError):
+                raise ValueError("Company ID must be an integer or convertible to integer")
+        
+        if salary is not None:
+            try:
+                salary = int(salary)
+                if salary < 0:
+                    print("Salary must be greater than 0")
+            except (TypeError, ValueError):
+                raise ValueError("Salary must be an integer or convertible to integer")
+        
+        if experience is not None:
+            try:
+                experience = int(experience)
+                if experience < 0:
+                    print("Experience must be greater than 0")
+                    return False
+            except(ValueError, TypeError):
+                raise ValueError("Experince must be an integer or convertible to integer")
+    
+
+        if employee_name is None or not isinstance(employee_name, str) or len(employee_name.strip()) < 3:
+            print("Employee name must be string format with length at least 3 characters")
+            
+            return False
+        
+        if employee_surname is None or not isinstance(employee_surname, str) or len(employee_surname.strip()) < 3:
+            print(f"Employee surname must be string format with length at least 3 characters")
+            return False
+        
+        email_pattern = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        if employee_email is None or not isinstance(employee_email, str) or not email_pattern.match(employee_email.strip()):
+            print("Invalid email format")
+            return False
+        
+        if start_date is None or not isinstance(start_date, str):
+            print("Start Date must be an string")
+            return False
+    
+    
+        cursor.execute('SELECT ID FROM EMPLOYEE WHERE ID = ?', (employee_id,))
+        if cursor.fetchone() is None:
+            print(f"ID with {employee_id} does not exists")
+            return False
+        # Name, Surname, Email, CompanyID, Salary, Experience, StartDate
+        
+        fields = []
+        values = []
+        
+        if employee_name:
+            fields.append('Name = ?')
+            values.append(employee_name.strip())
+            
+        if employee_surname:
+            fields.append('Surname = ?')
+            values.append(employee_surname.strip())
+
+        if employee_email:
+            fields.append('Email = ?')
+            values.append(employee_email.strip())
+            
+        if company_id:
+            fields.append('CompanyID = ?')
+            values.append(company_id)
+        
+        if salary:
+            fields.append('Salary = ?')
+            values.append(salary)
+            
+        if experience:
+            fields.append('Experience = ?')
+            values.append(experience)
+        
+        if start_date:
+            fields.append('StartDate = ?')
+            values.append(start_date.strip())
+            
+        if not fields:
+            print("No fields provided to update")
+            return False
+
+        values.append(employee_id)
+        sql_query = f"UPDATE EMPLOYEE SET {', '.join(fields)} WHERE ID = ?"
+        
+        cursor.execute(sql_query, tuple(values))
+        
+        #save changes and apply
+        conn.commit()
+        
+        # check count of effected_rows
+        
+        if cursor.rowcount > 0:
+            print(f"Employee updated successfully: {employee_id}")
+            return True
+        
+        print(f"No update performed for ID {employee_id}")
+        return False 
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
 
 
 

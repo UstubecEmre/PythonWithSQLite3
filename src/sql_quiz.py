@@ -759,7 +759,8 @@ def del_company(conn, cursor, company_id:int = None):
             return False 
         
             # del foreign key - primary key constraint
-        cursor.execute("DELETE FROM COMPANY WHERE ID = ?)", (company_id,))
+        cursor.execute("DELETE FROM EMPLOYEE WHERE CompanyID = ?", (company_id,))
+        cursor.execute("DELETE FROM COMPANY WHERE ID = ?", (company_id,))
         
         conn.commit()
         
@@ -771,6 +772,38 @@ def del_company(conn, cursor, company_id:int = None):
             
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
+    
+def del_employee(conn, cursor, employee_id:int = None):
+    try:
+        if employee_id is None:
+            print("employee_id is required")
+            return False
+        try:
+            employee_id = int(employee_id)
+            if employee_id <= 0:
+                print("employee_id must be greater than zero")
+                return False
+            
+        except (ValueError, TypeError):
+            raise ValueError("employee_id must be an integer or convertible integer")
+        
+        # check employee_id exists
+        cursor.execute("SELECT ID FROM EMPLOYEE WHERE ID = ?", (employee_id,))
+        if cursor.fetchone() is None:
+            print(f"{employee_id} with employee does not exists")
+            return False
+        
+        cursor.execute("DELETE FROM EMPLOYEE WHERE ID = ?", (employee_id,))
+        conn.commit()
+        
+        if cursor.rowcount > 0:
+            print(f"EmployeeID:{employee_id} deleted successfully")
+            return True
+        print(f"EmployeeID: {employee_id} could not be deleted")
+    
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured: {err}")
+    
 #%% select_five_rows
 
 

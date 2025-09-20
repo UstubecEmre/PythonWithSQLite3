@@ -162,9 +162,13 @@ Bu sayede tablolar, fonksiyonlar ve CRUD işlemleri otomatik olarak doğrulanabi
 Bu biraz pytest ve unittest üzerine yoğunlaşabileceğim bir zamanı bulabilir:)
 
 👨‍💻 Geliştirici
+
 Adı: Emre Üstübeç
+
 GitHub: UstubecEmre
+
 E-posta: emresb1999@gmail.com
+
 LinkedIn: Emre Üstübeç
 
 ## 📄 Lisans

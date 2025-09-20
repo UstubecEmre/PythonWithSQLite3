@@ -1,3 +1,7 @@
+main.py dosyamı hazırlarken saygı değer eğitmenimiz Atıl Samancıoğlu'nun 
+Veri Bilimi ve Makine Öğrenmesi 2025 : 100 Günlük Kamp eğitiminden faydalandım ve benzer örnekleri biraz daha ilerleterek 
+bu dosyaları hazırladım. Bunun için teşekkür ederek notlarıma başlamak istiyorum.
+
 Bu kısımda yazılım geliştiricilerin tablo yapısını daha iyi anlamasını sağlamak amacıyla, tablolar arasında dikkat etmesi
 gereken oluşum sıralamalarını ve tablodaki değerlerin ID numalarını vereceğim.
 

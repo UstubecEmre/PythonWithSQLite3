@@ -161,7 +161,7 @@ Projeye ilerleyen aşamalarda `tests/` klasörü eklenerek **pytest** ve **unitt
 Bu sayede tablolar, fonksiyonlar ve CRUD işlemleri otomatik olarak doğrulanabilir.
 Bu biraz pytest ve unittest üzerine yoğunlaşabileceğim bir zamanı bulabilir:)
 
-👨‍💻 Geliştirici
+## 👨‍💻 Geliştirici
 
 Adı: Emre Üstübeç
 

@@ -21,6 +21,7 @@ Bu proje, özellikle **CRUD işlemleri, JOIN, GROUP BY, AVG gibi SQL fonksiyonla
 ├── README.md
 ├── requirements.txt
 └── LICENCE
+└── .gitignore
 
 ```
 
@@ -153,6 +154,12 @@ python sql_quiz.py
 Pull request gönderebilir veya issue açabilirsiniz.
 
 ---
+
+## 🧪 Gelecekte Testler
+
+Projeye ilerleyen aşamalarda `tests/` klasörü eklenerek **pytest** ve **unittest** tabanlı testler yazılabilir.
+Bu sayede tablolar, fonksiyonlar ve CRUD işlemleri otomatik olarak doğrulanabilir.
+Bu biraz pytest ve unittest üzerine yoğunlaşabileceğim bir zamanı bulabilir:)
 
 ## 📄 Lisans
 

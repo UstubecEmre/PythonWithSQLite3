@@ -1,0 +1,91 @@
+Bu kısımda yazılım geliştiricilerin tablo yapısını daha iyi anlamasını sağlamak amacıyla, tablolar arasında dikkat etmesi
+gereken oluşum sıralamalarını ve tablodaki değerlerin ID numalarını vereceğim.
+
+Tablolarımız arasında foreign key- primary key bağlantısı kurduğumuz için bazı tabloları oluşturabilmemiz için onun bağlı olduğu
+sütunlara değer eklememiz gerekmektedir.
+
+Bizim sql_quiz dosyamızda ki bağımlılıklar şu şekildedir:
+COUNTRY
+COMPANY 
+EMPLOYEE
+Bu sıralama ile kayıt eklememiz gerekmektedir.
+Silmek için ise tam tersi sıralama kullanılabilir.
+Burada ki kısıtlamalar şu şekildedir.
+
+COMPANY.CountryID => COUNTRY.ID
+EMPLOYEE.CompanyID => COMPANY.ID
+
+Burada ki tablolarda inser_sample_to_country(), insert_sample_to_company() ve insert_sample_to_employee() fonksiyonlarını 
+hangi sıra ile çağırdığımız bu açıdan önemlidir.
+
+Eklenen kayıtlar da şu şekildedir:
+<b>Country</b> tablomuz için
+1  - Turkey  
+2  - Azerbaijan  
+3  - Uzbekistan  
+4  - Kyrgyzstan  
+5  - Hungary  
+6  - USA  
+7  - Germany  
+8  - France  
+9  - Italy  
+10 - Spain  
+11 - Portugal  
+12 - Poland  
+13 - Greece  
+14 - England  
+15 - Russia  
+16 - China  
+17 - South Korea  
+18 - North Korea  
+19 - Japan  
+20 - Singapore  
+21 - Qatar  
+22 - Saudi Arabia  
+23 - Egypt  
+24 - Norway  
+25 - Sweden  
+26 - Switzerland  
+27 - Argentina  
+28 - Brazil  
+29 - Uruguay  
+30 - Chile  
+31 - Mexico  
+
+Company tablomuz için:
+1 - ASTOR  
+2 - Sabanci Group  
+3 - Koc Group  
+4 - Microsoft  
+5 - Nvidia  
+6 - SOCAR  
+7 - Azercell  
+8 - BP  
+9 - Rolls-Royce  
+10 - Siemens  
+11 - Volkswagen  
+12 - Fiat  
+13 - Ferrari  
+
+Employee tablosu için:
+1  - Emre Ustubec  
+2  - Erol Ustubec  
+3  - Sule Ergin  
+4  - Fatma Senol  
+5  - Emre Dildoker  
+6  - Cemre Suberker  
+7  - Ahmet Yilmaz  
+8  - Ayse Demir  
+9  - Mehmet Kaya  
+10 - John Smith  
+11 - Zeynep Canikli  
+12 - Zuleyha Kirmizigul  
+13 - Emily Johnson  
+14 - Polen Hacioglu  
+15 - Rashad Aliyev  
+16 - Leyla Mammadova  
+17 - Oliver Brown  
+18 - Sophia Taylor  
+19 - Anna Schmidt  
+20 - Marco Rossi  
+21 - Giulia Bianchi  

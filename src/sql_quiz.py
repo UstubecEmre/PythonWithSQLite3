@@ -224,7 +224,7 @@ def insert_samples_to_employee(conn, cursor,company_ids):
 def get_company(cursor, company_name: str):
     try:
         cursor.execute('''
-                    SELECT * FROM COMPANY WHERE CompanyName = '?' 
+                    SELECT * FROM COMPANY WHERE CompanyName = ? 
                     ''',(company_name,))
         records = cursor.fetchall()
         #ID, CompanyName, CompanyVision, CountryID, EstablishedDate, 
@@ -301,7 +301,7 @@ def insert_sample_to_country(conn,cursor, country_name: str = None):
         # is there any record (daha onceden o isimde var mi)
         cursor.execute('SELECT * FROM COUNTRY WHERE Country = ?',(country_name,))
         record = cursor.fetchone()
-        if record is not None:
+        if record is None:
             print(f"This Country {record[1]} Already exists")
             return False
         
@@ -350,8 +350,8 @@ def insert_sample_to_company(conn, cursor, company_name: str = None, company_vis
             return False
         
         cursor.execute('SELECT ID FROM COUNTRY WHERE ID = ?', (country_id,))
-        if cursor.fetchone():
-            print(f"CountryID: {country_id} already exists")
+        if cursor.fetchone() is None:
+            print(f"CountryID: {country_id} does not exists")
             return False
         
         cursor.execute('''
@@ -461,7 +461,7 @@ def update_country(conn, cursor, country_id: int = None, new_country_name : str 
             return False 
         
         cursor.execute('''
-                       UPDATE COUNTRY SET Name = ? WHERE ID = ?
+                       UPDATE COUNTRY SET Country = ? WHERE ID = ?
                        ''', (new_country_name.strip(), country_id,))
         conn.commit()   
         
@@ -686,7 +686,7 @@ def update_employee(conn,
 
 def del_country(conn, cursor, country_id:int = None):
     try:
-        if country_id is not None:
+        if country_id is None:
             print("country_id is required")
             return False
         
@@ -847,8 +847,7 @@ def get_name_ordered_employee(cursor):
              print(f"ID: {record[0]}, Name: {record[1]}, Surname: {record[2]}, Email: {record[3]}, "
                   f"CompanyID: {record[4]}, Salary: {record[5]}, Experience: {record[6]}, StartDate: {record[7]}")
              
-            """
-            More readable option
+        """More readable option
             print(f"Employee ID: {record[0]}")
             print(f"Employee Name: {record[1]}")
             print(f"Employee Surname: {record[2]}")
@@ -927,6 +926,32 @@ def join__example(cursor, employee_id):
     except sqlite3.Error as err:
         raise Exception(f"An unexpected error occured: {err}")
 
+
+#%% group by example => average salaries by country
+def get_avg_salary_grouped(cursor):
+    try:
+        cursor.execute("""
+                       SELECT CT.Country AS ULKE,
+                       C.Company AS SIRKET, 
+                       AVG(E.Salary) AS ORTALAMA_MAAS
+                       FROM EMPLOYEE AS E
+                       JOIN COMPANY AS C ON E.CompanyID = C.ID
+                       JOIN COUNTRY AS CT ON C.CountryID = CT.ID
+                       GROUP BY CT.Country, C.Company
+                       
+                       """)
+        
+        records = cursor.fetchall()
+        if not records:
+            print("No records found")
+            return [] 
+
+        for record in records:
+           print(f"Country: {record[0]}, Company: {record[1]}, Average Salary: {record[2]}")       
+        return records 
+    
+    except sqlite3.Error as err:
+        raise Exception(f"An unexpected error occured")
 
 
 #%% create main function

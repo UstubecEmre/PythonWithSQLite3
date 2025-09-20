@@ -1,0 +1,5 @@
+# Bu proje için extra bir paket kurulmasına ihtiyaç yoktur.
+---
+# sqlite3: Python standart kütüphanesi, ekstra yüklemeye gerek yok
+# os: Python standart kütüphanesi
+# Veri tabanını görüntülemek için DBeaver veya SQLite Viewer kullanılabilir
